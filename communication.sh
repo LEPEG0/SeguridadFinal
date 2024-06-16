@@ -24,8 +24,57 @@ solicitar_llave_publica() {
     echo "$public_key"
 }
 
-# Main function
-main() {
+# Función para recibir y validar el mensaje
+recibir_y_validar() {
+    local destino_ip=$1
+
+    # Descargar el archivo y los hashes
+    scp "$destino_ip:~/imagen_oculta.png" .
+    scp "$destino_ip:~/hashes.txt" .
+
+    # Leer los hashes
+    read -r sha384_hash sha512_hash blake2_hash < hashes.txt
+
+    # Validar el hash Blake2
+    blake2_hash_local=$(b2sum imagen_oculta.png | awk '{print $1}')
+    if [ "$blake2_hash_local" != "$blake2_hash" ]; then
+        zenity --error --title="Error" --text="Comunicación alterada. El hash Blake2 no coincide."
+        rm imagen_oculta.png
+        exit 1
+    fi
+
+    # Extraer el archivo oculto
+    steghide extract -sf imagen_oculta.png -p "" -xf mensaje_encriptado.enc
+
+    # Validar el hash SHA-512 del mensaje encriptado
+    sha512_hash_local=$(sha512sum mensaje_encriptado.enc | awk '{print $1}')
+    if [ "$sha512_hash_local" != "$sha512_hash" ]; then
+        zenity --error --title="Error" --text="Error de integridad. El hash SHA-512 no coincide."
+        rm mensaje_encriptado.enc
+        exit 1
+    fi
+
+    # Desencriptar el mensaje
+    openssl pkeyutl -decrypt -in mensaje_encriptado.enc -inkey llave_privada.pem -out mensaje.txt
+    if [ $? -ne 0 ]; then
+        zenity --error --title="Error" --text="Error al desencriptar el mensaje."
+        rm mensaje_encriptado.enc mensaje.txt
+        exit 1
+    fi
+
+    # Validar el hash SHA-384 del mensaje desencriptado
+    sha384_hash_local=$(sha384sum mensaje.txt | awk '{print $1}')
+    if [ "$sha384_hash_local" != "$sha384_hash" ]; then
+        zenity --error --title="Error" --text="Error de integridad. El hash SHA-384 no coincide."
+        rm mensaje.txt
+        exit 1
+    fi
+
+    zenity --info --title="Éxito" --text="Mensaje recibido y validado correctamente."
+}
+
+# Función principal para enviar el mensaje
+enviar_mensaje() {
     # Solicitar la llave pública
     public_key=$(solicitar_llave_publica)
 
@@ -59,23 +108,43 @@ main() {
 
     # Guardar los hashes en un archivo txt
     hash_file="hashes.txt"
-    echo "HASH SHA384 del mensaje: $sha384_hash" > "$hash_file"
-    echo "HASH SHA512 del mensaje encriptado: $sha512_hash" >> "$hash_file"
-    echo "HASH Blake2 de la imagen con el archivo oculto: $blake2_hash" >> "$hash_file"
+    echo "$sha384_hash $sha512_hash $blake2_hash" > "$hash_file"
 
     zenity --info --text="Hashes guardados en $hash_file"
 
-    # Enviar el mensaje al otro equipo (esto se puede hacer mediante SCP o cualquier otro método)
+    # Enviar el mensaje al otro equipo
     destino_ip=$(zenity --entry --title="Enviar mensaje" --text="Ingrese la IP del equipo destinatario:")
     if [ -z "$destino_ip" ]; then
         zenity --error --title="Error" --text="La IP del equipo destinatario no puede estar vacía."
         exit 1
     fi
 
-    scp "$image" "$destino_ip:~/"
-    scp "$hash_file" "$destino_ip:~/"
+    scp "$image" "$destino_ip:~/imagen_oculta.png"
+    scp "$hash_file" "$destino_ip:~/hashes.txt"
 
     zenity --info --text="Mensaje enviado al equipo con IP $destino_ip"
 }
 
-main
+# Función principal para recibir el mensaje
+recibir_mensaje() {
+    destino_ip=$(zenity --entry --title="Recibir mensaje" --text="Ingrese la IP del equipo que envía el mensaje:")
+    if [ -z "$destino_ip" ]; entonces
+        zenity --error --title="Error" --text="La IP del equipo que envía el mensaje no puede estar vacía."
+        exit 1
+    fi
+
+    recibir_y_validar "$destino_ip"
+}
+
+# Mostrar menú para enviar o recibir mensaje
+choice=$(zenity --list --radiolist \
+    --title="Seleccionar acción" \
+    --text="¿Deseas enviar o recibir un mensaje?" \
+    --column="" --column="Opción" \
+    TRUE "Enviar mensaje" FALSE "Recibir mensaje")
+
+if [ "$choice" == "Enviar mensaje" ]; entonces
+    enviar_mensaje
+else
+    recibir_mensaje
+fi
