@@ -14,10 +14,18 @@ obtener_mac() {
 
 # Solicitar al usuario que ingrese el nombre de usuario y la contraseña
 usuario=$(zenity --entry --title="Inicio de Sesión" --text="Ingrese su nombre de usuario:")
-contrasena=$(zenity --password --title="Inicio de Sesión" --text="Ingrese su contraseña:")
-aceptar_politicas=$(zenity --question --title="Políticas de Privacidad" --text="¿Acepta las políticas de privacidad y términos de uso?" --ok-label="Aceptar" --cancel-label="Cancelar")
+if [ -z "$usuario" ]; then
+    zenity --error --title="Error" --text="El nombre de usuario no puede estar vacío."
+    exit 1
+fi
 
-# Verificar si el usuario aceptó las políticas
+contrasena=$(zenity --password --title="Inicio de Sesión" --text="Ingrese su contraseña:")
+if [ -z "$contrasena" ]; then
+    zenity --error --title="Error" --text="La contraseña no puede estar vacía."
+    exit 1
+fi
+
+aceptar_politicas=$(zenity --question --title="Políticas de Privacidad" --text="¿Acepta las políticas de privacidad y términos de uso?" --ok-label="Aceptar" --cancel-label="Cancelar")
 if [ $? -ne 0 ]; then
     zenity --error --title="Error" --text="Debe aceptar las políticas de privacidad para continuar."
     exit 1
