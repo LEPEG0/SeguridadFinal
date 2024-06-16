@@ -128,7 +128,7 @@ enviar_mensaje() {
 # Función principal para recibir el mensaje
 recibir_mensaje() {
     destino_ip=$(zenity --entry --title="Recibir mensaje" --text="Ingrese la IP del equipo que envía el mensaje:")
-    if [ -z "$destino_ip" ]; entonces
+    if [ -z "$destino_ip" ]; then
         zenity --error --title="Error" --text="La IP del equipo que envía el mensaje no puede estar vacía."
         exit 1
     fi
@@ -143,7 +143,7 @@ choice=$(zenity --list --radiolist \
     --column="" --column="Opción" \
     TRUE "Enviar mensaje" FALSE "Recibir mensaje")
 
-if [ "$choice" == "Enviar mensaje" ]; entonces
+if [ "$choice" == "Enviar mensaje" ]; then
     enviar_mensaje
 else
     recibir_mensaje
