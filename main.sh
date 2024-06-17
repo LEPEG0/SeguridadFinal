@@ -1,10 +1,18 @@
 #!/bin/bash
 
-# Incluir funciones utilitarias
-source ./utils.sh
+echo "Iniciando el sistema de comunicaciones seguras..."
 
-# Ejecutar la pantalla de inicio de sesión
-source ./login.sh
+# Obtener la dirección MAC de la contraparte
+source ./get_mac_address.sh
 
-# Ejecutar el script de comunicación
-source ./communication.sh
+# Solicitar la llave pública del administrador por SSH
+source ./get_public_key.sh
+
+# Capturar o seleccionar un archivo y cifrarlo
+source ./encrypt_message.sh
+
+# Enviar el archivo cifrado a otro equipo
+source ./send_encrypted_file.sh
+
+echo "Sistema de comunicaciones seguras completado."
+
