@@ -1,17 +1,19 @@
 #!/bin/bash
 
+# 1
 echo "Iniciando el sistema de comunicaciones seguras..."
 
-# Obtener la dirección MAC de la contraparte
+# 2
 source ./get_mac_address.sh
 
-# Generar las llaves RSA y enviarlas a la contraparte
+# 3
 source ./generate_and_send_keys.sh
 
-# Capturar o seleccionar un archivo y cifrarlo
+# 4
 source ./encrypt_message.sh
 
-# Enviar el archivo cifrado a otro equipo
+# 5
 source ./send_encrypted_file.sh
 
+# 6
 echo "Sistema de comunicaciones seguras completado."
