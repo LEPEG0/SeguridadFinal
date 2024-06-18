@@ -5,7 +5,7 @@ encrypt_message() {
     if [ "$choice" -eq 1 ]; then
         read -p "Ingrese el mensaje a cifrar: " message
         echo "$message" > mensaje.txt
-        openssl pkeyutl -sign -inkey /home/leo/Segu-Pro/public_key.pem -in mensaje.txt -out mensaje_cifrado.bin
+        openssl rsautl -encrypt -inkey ~/.ssh/public_key.pem -pubin -in mensaje.txt -out mensaje_cifrado.bin
         if [ $? -eq 0 ]; then
             echo "Mensaje cifrado y guardado en mensaje_cifrado.bin"
             sha384sum mensaje.txt | awk '{ print $1 }' > mensaje_cifrado.bin.sha384
@@ -24,7 +24,7 @@ encrypt_message() {
             echo "El archivo no existe."
             exit 1
         fi
-        openssl pkeyutl -sign -inkey /home/leo/Segu-Pro/public_key.pem -in "$file_path" -out archivo_cifrado.bin
+        openssl rsautl -encrypt -inkey ~/.ssh/public_key.pem -pubin -in "$file_path" -out archivo_cifrado.bin
         if [ $? -eq 0 ]; then
             echo "Archivo cifrado y guardado en archivo_cifrado.bin"
             sha384sum "$file_path" | awk '{ print $1 }' > archivo_cifrado.bin.sha384
