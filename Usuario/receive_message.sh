@@ -15,7 +15,7 @@ validate_blake2() {
     else
         # 7
         echo "Comunicación alterada. Eliminando mensaje..."
-        #rm mensaje_cifrado.bin mensaje_cifrado.bin.blake2 mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 stego_output
+        rm mensaje_cifrado.bin mensaje_cifrado.bin.blake2 mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 stego_output
         exit 1
     fi
 }
@@ -28,7 +28,7 @@ extract_message() {
     if [ $? -eq 0 ]; then
         # 11
         echo "Mensaje extraído correctamente."
-        #rm stego_output
+        rm stego_output
     else
         # 12
         echo "Error al extraer el mensaje."
@@ -51,7 +51,7 @@ validate_sha512() {
     else
         # 19
         echo "Error en la verificación SHA-512. Eliminando mensaje..."
-        #rm mensaje_cifrado.bin mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 mensaje_cifrado.bin.blake2
+        rm mensaje_cifrado.bin mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 mensaje_cifrado.bin.blake2
         exit 1
     fi
 }
@@ -76,7 +76,7 @@ decrypt_message() {
     else
         # 27
         echo "Error al desencriptar el archivo."
-        #rm mensaje_cifrado.bin mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 mensaje_cifrado.bin.blake2
+        rm mensaje_cifrado.bin mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 mensaje_cifrado.bin.blake2
         exit 1
     fi
 }
@@ -96,7 +96,7 @@ validate_sha384() {
     else
         # 34
         echo "El sistema fue vulnerado. Eliminando mensaje..."
-        #rm mensaje_cifrado.bin mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 mensaje_cifrado.bin.blake2 mensaje_desencriptado.txt
+        rm mensaje_cifrado.bin mensaje_cifrado.bin.sha384 mensaje_cifrado.bin.sha512 mensaje_cifrado.bin.blake2 mensaje_desencriptado.txt
         exit 1
     fi
 }
